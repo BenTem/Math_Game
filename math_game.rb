@@ -1,52 +1,93 @@
 require 'colorize'
-@player_1 = 3
-@player_2 = 3
-@play = true
+require 'pry'
 
+class Player
 
-def question_generator_1
+  attr_accessor :name, :lives, :score
+
+  def initialize(name)
+    @name = name
+    @lives = 3
+    @score = 0
+    puts "Created new player: #{name}".colorize(:yellow)
+  end
+
+  def lose_life
+    self.lives -= 1
+  end
+
+  def win_point
+    self.score += 1
+  end
+
+  def reset_lives
+    self.lives = 3
+  end
+
+end
+
+def question_generator(player)
   @num_1 = rand(20)
   @num_2 = rand(20)
-  puts "Player 1, what is #{@num_1} plus #{@num_2}?".colorize(:cyan)
+  math_signs = [:+, :-, :*]
+  math_sign_selector = math_signs.sample
+
+  puts "#{player.name}, what is #{@num_1} #{math_sign_selector} #{@num_2}?".colorize(:cyan)
   input = gets.chomp
-  if input.to_i == @num_1 + @num_2
-    puts "You got it! #{@player_1} lives left!".colorize(:cyan)
+
+  if input.to_i == @num_1.send(math_sign_selector, @num_2)
+    player.win_point
+    puts "You got it! #{player.name} has #{player.lives} lives left!".colorize(:green)
+    puts "#{player.name}'s score is #{player.score}."
   else
-    @player_1 = @player_1 - 1
-    puts "Oh no! You have #{@player_1} lives left".colorize(:cyan)
+    player.lose_life
+    puts "Wrong, the correct answer is #{@num_1.send(math_sign_selector, @num_2)}".colorize(:light_red)
+      if player.lives < 1
+        puts "#{player.name} has #{player.lives} lives left. #{player.name} loses!".colorize(:light_red)
+        puts "#{player.name}'s score is #{player.score}."
+      else
+        puts "#{player.name} has #{player.lives} lives left".colorize(:yellow)
+        puts "#{player.name}'s score is #{player.score}."
+      end
   end
 end
 
-def question_generator_2
-  @num_1 = rand(20)
-  @num_2 = rand(20)
-  puts "Player 2, what is #{@num_1} plus #{@num_2}?".colorize(:green)
-  input = gets.chomp
-  if input.to_i == @num_1 + @num_2
-    puts "You got it! #{@player_2} lives left!".colorize(:green)
-  else
-    @player_2 = @player_2 - 1
-    puts "Oh no! You have #{@player_2} lives left".colorize(:green)
-  end
-end
-
-def lives
-  if @player_1 == 0 || @player_2 == 0
-     @play = false
-     puts "Game over!".colorize(:red)
-  end
-end
 
 def game
-  while @play ==   true
-    question_generator_1
-    lives
-      if @player_1 == 0
-        break
-      end
-    question_generator_2
-    lives
+
+  until @name_1.lives == 0 || @name_2.lives == 0
+    question_generator(@name_1)
+      break if @name_1.lives == 0
+    question_generator(@name_2)
   end
+
+  puts "#{@name_1.name}'s score is #{@name_1.score}. #{@name_2.name}'s score is #{@name_2.score}."
+  puts "Play again? Y/N"
+  input = gets.chomp.downcase.to_s
+  if input == 'y'
+    @name_1.reset_lives
+    @name_2.reset_lives
+    game
+
+  end
+
 end
 
-game
+def player_creation
+  puts "Player one name:"
+  @name_1 = gets.chomp
+  @name_1 = Player.new(@name_1)
+
+  puts "Player two name:"
+  @name_2 = gets.chomp
+  @name_2 = Player.new(@name_2)
+
+  game
+end
+
+player_creation
+
+
+
+
+
