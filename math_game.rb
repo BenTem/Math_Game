@@ -26,6 +26,9 @@ class Player
 
 end
 
+class ArgumentError < StandardError  
+end  
+
 def question_generator(player)
   @num_1 = rand(20)
   @num_2 = rand(20)
@@ -35,6 +38,11 @@ def question_generator(player)
   puts "#{player.name}, what is #{@num_1} #{math_sign_selector} #{@num_2}?".colorize(:cyan)
   input = gets.chomp
 
+  begin
+    raise ArgumentError, 'Argument is not numeric' unless input =~ /\A[-+]?[0-9]*\.?[0-9]+\Z/
+  rescue ArgumentError
+    puts "Warning! Argument is not numeric!"
+  end
   if input.to_i == @num_1.send(math_sign_selector, @num_2)
     player.win_point
     puts "You got it! #{player.name} has #{player.lives} lives left!".colorize(:green)
